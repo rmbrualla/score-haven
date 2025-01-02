@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Flag } from "lucide-react";
+import { ChevronLeft, ChevronRight, Flag, Plus, Minus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface GameState {
@@ -24,15 +23,28 @@ const GamePlay = () => {
       navigate('/');
       return;
     }
-    setGameState(JSON.parse(savedState));
+    
+    const parsedState = JSON.parse(savedState);
+    // Initialize scores with default value of 3 if they don't exist
+    if (!parsedState.scores || parsedState.scores.length === 0) {
+      parsedState.scores = parsedState.players.map(() => 
+        new Array(parsedState.numHoles).fill(3)
+      );
+    }
+    setGameState(parsedState);
   }, [navigate]);
 
   if (!gameState) return null;
 
-  const updateScore = (playerIndex: number, score: string) => {
-    const numScore = parseInt(score) || 0;
+  const updateScore = (playerIndex: number, increment: boolean) => {
     const newScores = [...gameState.scores];
-    newScores[playerIndex][gameState.currentHole - 1] = numScore;
+    const currentScore = newScores[playerIndex][gameState.currentHole - 1];
+    const newScore = increment ? currentScore + 1 : currentScore - 1;
+    
+    // Prevent negative scores
+    if (newScore < 1) return;
+    
+    newScores[playerIndex][gameState.currentHole - 1] = newScore;
     
     const newState = {
       ...gameState,
@@ -86,13 +98,26 @@ const GamePlay = () => {
                   Total: {getPlayerTotal(playerIndex)}
                 </span>
               </div>
-              <Input
-                type="number"
-                value={gameState.scores[playerIndex][gameState.currentHole - 1] || ''}
-                onChange={(e) => updateScore(playerIndex, e.target.value)}
-                min={1}
-                placeholder="Enter score"
-              />
+              <div className="flex items-center justify-between gap-4 rounded-md border p-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => updateScore(playerIndex, false)}
+                  disabled={gameState.scores[playerIndex][gameState.currentHole - 1] <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="text-2xl font-semibold">
+                  {gameState.scores[playerIndex][gameState.currentHole - 1]}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => updateScore(playerIndex, true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
