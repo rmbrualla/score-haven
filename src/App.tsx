@@ -14,7 +14,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename="score-haven">
         <Routes>
           <Route path="/" element={<GameSetup />} />
           <Route path="/play" element={<GamePlay />} />
