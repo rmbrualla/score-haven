@@ -3,7 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import GameSetup from "./pages/GameSetup";
+import GamePlay from "./pages/GamePlay";
+import GameResults from "./pages/GameResults";
 
 const queryClient = new QueryClient();
 
@@ -14,7 +16,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<GameSetup />} />
+          <Route path="/play" element={<GamePlay />} />
+          <Route path="/results" element={<GameResults />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
