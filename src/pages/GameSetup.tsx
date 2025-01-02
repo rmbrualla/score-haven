@@ -48,13 +48,6 @@ const GameSetup = () => {
       return;
     }
 
-    // Initialize scores array with zeros, then set first hole to 3
-    const initialScores = filledPlayers.map(() => {
-      const scores = Array(numHoles).fill(0);
-      scores[0] = 3; // Set only the first hole to 3
-      return scores;
-    });
-
     localStorage.setItem('gameState', JSON.stringify({
       numHoles,
       players: filledPlayers,
