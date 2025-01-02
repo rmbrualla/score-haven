@@ -59,7 +59,7 @@ const GameSetup = () => {
       numHoles,
       players: filledPlayers,
       currentHole: 1,
-      scores: initialScores,
+      scores: filledPlayers.map(player => Array(numHoles).fill(0)),
       gameStarted: new Date().toISOString()
     }));
 
