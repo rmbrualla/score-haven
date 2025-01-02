@@ -17,6 +17,22 @@ const GamePlay = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const updateScoresIfZero = () => {
+    if (!gameState) return;
+
+    const updatedScores = gameState.scores.map((playerScores) => {
+      if (playerScores[gameState.currentHole - 1] === 0) {
+        playerScores[gameState.currentHole - 1] = 3;
+      }
+      return playerScores;
+    });
+
+    setGameState({
+      ...gameState,
+      scores: updatedScores
+    });
+  };
+
   useEffect(() => {
     const savedState = localStorage.getItem('gameState');
     if (!savedState) {
@@ -33,6 +49,14 @@ const GamePlay = () => {
     }
     setGameState(parsedState);
   }, [navigate]);
+
+  useEffect(() => {
+    updateScoresIfZero();
+  }, [gameState?.currentHole]);
+
+  useEffect(() => {
+    updateScoresIfZero();
+  }, []);
 
   if (!gameState) return null;
 
