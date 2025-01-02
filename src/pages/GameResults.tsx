@@ -53,7 +53,7 @@ const GameResults = () => {
       };
     });
 
-    // Sort by total score
+    // Sort by total score and group by position
     playerStats.sort((a, b) => a.total - b.total);
     setStats(playerStats);
   }, [navigate]);
@@ -64,6 +64,26 @@ const GameResults = () => {
   };
 
   if (!gameState || !stats.length) return null;
+
+  // Group players by their scores to handle ties
+  const podiumPositions = stats.reduce((acc: { [key: number]: PlayerStats[] }, player) => {
+    if (!acc[player.total]) {
+      acc[player.total] = [];
+    }
+    acc[player.total].push(player);
+    return acc;
+  }, {});
+
+  // Convert grouped scores to positions (1st, 2nd, 3rd)
+  const positions: PlayerStats[][] = [[], [], []]; // gold, silver, bronze
+  let currentPosition = 0;
+  
+  Object.values(podiumPositions).forEach((players) => {
+    if (currentPosition < 3) {
+      positions[currentPosition] = players;
+      currentPosition += 1;
+    }
+  });
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -76,27 +96,34 @@ const GameResults = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {stats.slice(0, 3).map((player, index) => (
-            <div
-              key={player.name}
-              className="bg-card p-6 rounded-lg text-center space-y-2"
-            >
-              <Trophy
-                className={`mx-auto h-8 w-8 ${
-                  index === 0
-                    ? "text-yellow-500"
-                    : index === 1
-                    ? "text-gray-400"
-                    : "text-amber-600"
-                }`}
-              />
-              <h3 className="font-bold">{player.name}</h3>
-              <p className="text-2xl font-semibold">{player.total}</p>
-              <p className="text-muted-foreground">
-                {index === 0 ? "1st" : index === 1 ? "2nd" : "3rd"} Place
-              </p>
-            </div>
-          ))}
+          {positions.map((players, positionIndex) => 
+            players.map((player, playerIndex) => (
+              <div
+                key={player.name}
+                className="bg-card p-6 rounded-lg text-center space-y-2"
+                style={{
+                  gridColumn: players.length > 1 ? "span 3" : "auto",
+                  order: positionIndex === 0 ? 2 : positionIndex === 1 ? 1 : 3
+                }}
+              >
+                <Trophy
+                  className={`mx-auto h-8 w-8 ${
+                    positionIndex === 0
+                      ? "text-yellow-500"
+                      : positionIndex === 1
+                      ? "text-gray-400"
+                      : "text-amber-600"
+                  }`}
+                />
+                <h3 className="font-bold">{player.name}</h3>
+                <p className="text-2xl font-semibold">{player.total}</p>
+                <p className="text-muted-foreground">
+                  {positionIndex === 0 ? "Gold" : positionIndex === 1 ? "Silver" : "Bronze"}
+                  {players.length > 1 ? ` (Tied with ${players.length - 1} other${players.length > 2 ? 's' : ''})` : ''}
+                </p>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="rounded-lg border">
